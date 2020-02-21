@@ -1,0 +1,8 @@
+server:
+  port: 9080
+  # Spring MVC dispatcher servlet path. Needs to be different than Jersey's to enable/disable Actuator endpoints access (/info, /health, ...)
+  servlet.path: /
+
+spring:
+  datasources:
+    data: classpath*:profileOne/data-h2.sql

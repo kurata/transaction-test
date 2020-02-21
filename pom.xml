@@ -10,6 +10,7 @@
     <modules>
         <module>simple-persistence</module>
         <module>simple-service</module>
+        <module>transaction-service</module>
     </modules>
     <packaging>pom</packaging>
 

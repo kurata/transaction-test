@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Api(value = "NumberResource")
-@RequestMapping("/api/v1/resource")
+@RequestMapping("/api/v1/resources")
 public interface ResourceApiDefinition {
 
     @ApiOperation(

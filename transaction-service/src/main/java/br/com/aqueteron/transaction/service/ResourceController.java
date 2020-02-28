@@ -24,18 +24,25 @@ public class ResourceController implements ResourceApiDefinition {
     }
 
     @Override
-    public ResponseEntity<Resource> postNumbers(final Resource resource) {
+    public ResponseEntity<Resource> postResources(final Resource resource) {
         String resourceId = resource.getId();
         try {
-            ResponseEntity<Resource> firstResponseEntity = this.restTemplate.postForEntity(RESOURCES_FIRST_HOST, resource, Resource.class);
-            try{
-                ResponseEntity<Resource> secondResponseEntity = this.restTemplate.postForEntity(SECOND_HOST, resource, Resource.class);
+            this.restTemplate.postForEntity(RESOURCES_FIRST_HOST, resource, Resource.class);
+            try {
+                this.restTemplate.postForEntity(SECOND_HOST, resource, Resource.class);
                 return ResponseEntity.status(HttpStatus.CREATED).body(resource);
-            } catch (HttpClientErrorException e){
+            } catch (HttpClientErrorException e) {
                 this.restTemplate.delete(RESOURCE_FIRST_HOST, resourceId);
             }
-        } catch (HttpClientErrorException e){
+        } catch (HttpClientErrorException e) {
         }
         return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    }
+
+    @Override
+    public ResponseEntity<Resource> postResources2pc(final Resource resource) {
+//        commitRequestPhase();
+//        commitPhase();
+        return null;
     }
 }

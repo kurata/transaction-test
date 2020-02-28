@@ -9,13 +9,15 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "resource")
-@ApiModel(description = "Resource")
 public class Resource implements Serializable {
 
     @Id
     @Column(columnDefinition = "char(36)", nullable = false)
     @ApiModelProperty(notes = "The resource id")
     private final String id;
+
+    @Enumerated(EnumType.STRING)
+    private ResourceState state;
 
     public Resource() {
         this.id = null;
@@ -27,5 +29,13 @@ public class Resource implements Serializable {
 
     public String getId() {
         return this.id;
+    }
+
+    public ResourceState getState() {
+        return state;
+    }
+
+    public void setState(ResourceState state) {
+        this.state = state;
     }
 }

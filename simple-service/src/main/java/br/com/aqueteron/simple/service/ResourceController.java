@@ -19,9 +19,11 @@ public class ResourceController implements ResourceApiDefinition {
     }
 
     @Override
-    public ResponseEntity<Resource> postResource(final Resource resource) {
-        Optional<Resource> resourceOptional = this.resourceRepository.findById(resource.getId());
+    public ResponseEntity<Resource> postResource(final ResourceApiResource resourceRequested) {
+        Optional<Resource> resourceOptional = this.resourceRepository.findById(resourceRequested.getId());
         if (!resourceOptional.isPresent()) {
+            Resource resource = new Resource(resourceRequested.getId());
+            resource.setState(ResourceState.COMMITTED);
             return ResponseEntity.status(HttpStatus.CREATED).body(this.resourceRepository.save(resource));
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();

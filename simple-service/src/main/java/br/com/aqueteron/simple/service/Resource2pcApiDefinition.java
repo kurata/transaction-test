@@ -1,15 +1,14 @@
 package br.com.aqueteron.simple.service;
 
 import io.swagger.annotations.*;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 
 @Api(value = "NumberResource")
-@RequestMapping("/api/v1/resources")
-public interface ResourceApiDefinition {
+@RequestMapping("/api/v1/resources/2pc")
+public interface Resource2pcApiDefinition {
 
     @ApiOperation(
             value = "Create a Resource.",
@@ -23,6 +22,28 @@ public interface ResourceApiDefinition {
     })
     @Transactional
     ResponseEntity<Resource> postResource(@RequestBody ResourceApiResource resource);
+
+    @ApiOperation(
+            value = "Release a Resource.",
+            produces = "application/json"
+    )
+    @PatchMapping("/{resourceId}/release")
+    @ApiResponses(
+            @ApiResponse(code = 200, message = "Successfully release Resource")
+    )
+    @Transactional
+    ResponseEntity<Resource> patchResourceRelease(@ApiParam(value = "Resource id to release") @PathVariable("resourceId") String resourceId);
+
+    @ApiOperation(
+            value = "Rollback a Resource.",
+            produces = "application/json"
+    )
+    @PatchMapping("/{resourceId}/rollback")
+    @ApiResponses(
+            @ApiResponse(code = 200, message = "Successfully rollback Resource")
+    )
+    @Transactional
+    ResponseEntity<Resource> patchResourceRollback(@ApiParam(value = "Resource id to rollback") @PathVariable("resourceId") String resourceId);
 
     @ApiOperation(
             value = "Delete a Resource.",

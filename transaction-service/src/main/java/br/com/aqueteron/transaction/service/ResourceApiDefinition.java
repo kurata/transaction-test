@@ -20,6 +20,15 @@ public interface ResourceApiDefinition {
     )
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    ResponseEntity<Resource> postNumbers(@RequestBody final Resource resource);
+    ResponseEntity<Resource> postResources(@RequestBody final Resource resource);
+
+    @ApiOperation(
+            value = "Create a Number.",
+            consumes = "application/json",
+            produces = "application/json"
+    )
+    @PostMapping("/2pc")
+    @ResponseStatus(HttpStatus.CREATED)
+    ResponseEntity<Resource> postResources2pc(@RequestBody final Resource resource);
 
 }

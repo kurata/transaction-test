@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 
-@Api(value = "NumberResource")
+@Api(value = "2PC Resource")
 @RequestMapping("/api/v1/resources/2pc")
 public interface Resource2pcApiDefinition {
 

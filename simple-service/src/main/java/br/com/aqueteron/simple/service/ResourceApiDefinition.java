@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 
-@Api(value = "NumberResource")
+@Api(value = "Resource")
 @RequestMapping("/api/v1/resources")
 public interface ResourceApiDefinition {
 

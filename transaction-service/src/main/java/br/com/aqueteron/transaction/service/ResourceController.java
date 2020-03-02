@@ -14,7 +14,19 @@ public class ResourceController implements ResourceApiDefinition {
 
     private static final String RESOURCE_FIRST_HOST = "http://localhost:9080/api/v1/resources/{id}";
 
-    private static final String SECOND_HOST = "http://localhost:9070/api/v1/resources";
+    private static final String RESOURCE_SECOND_HOST = "http://localhost:9070/api/v1/resources";
+
+    private static final String RESOURCES_2PC_FIRST_HOST = "http://localhost:9080/api/v1/resources/2pc";
+
+    private static final String RESOURCES_2PC_SECOND_HOST = "http://localhost:9070/api/v1/resources/2pc";
+
+    private static final String COMMIT_RESOURCES_2PC_FIRST_HOST = "http://localhost:9080/api/v1/resources/2pc/{id}/release";
+
+    private static final String COMMIT_RESOURCES_2PC_SECOND_HOST = "http://localhost:9070/api/v1/resources/2pc/{id}/release";
+
+    private static final String ROLLBACK_RESOURCES_2PC_FIRST_HOST = "http://localhost:9080/api/v1/resources/2pc/{id}/rollback";
+
+    private static final String ROLLBACK_RESOURCES_2PC_SECOND_HOST = "http://localhost:9070/api/v1/resources/2pc/{id}/rollback";
 
     private RestTemplate restTemplate;
 
@@ -29,7 +41,7 @@ public class ResourceController implements ResourceApiDefinition {
         try {
             this.restTemplate.postForEntity(RESOURCES_FIRST_HOST, resource, Resource.class);
             try {
-                this.restTemplate.postForEntity(SECOND_HOST, resource, Resource.class);
+                this.restTemplate.postForEntity(RESOURCE_SECOND_HOST, resource, Resource.class);
                 return ResponseEntity.status(HttpStatus.CREATED).body(resource);
             } catch (HttpClientErrorException e) {
                 this.restTemplate.delete(RESOURCE_FIRST_HOST, resourceId);
@@ -41,8 +53,17 @@ public class ResourceController implements ResourceApiDefinition {
 
     @Override
     public ResponseEntity<Resource> postResources2pc(final Resource resource) {
-//        commitRequestPhase();
-//        commitPhase();
-        return null;
+        String resourceId = resource.getId();
+        try {
+            this.restTemplate.postForEntity(RESOURCES_2PC_FIRST_HOST, resource, Resource.class);
+            this.restTemplate.postForEntity(RESOURCES_2PC_SECOND_HOST, resource, Resource.class);
+        } catch (HttpClientErrorException e) {
+            this.restTemplate.patchForObject(ROLLBACK_RESOURCES_2PC_FIRST_HOST, null, Resource.class, resourceId);
+            this.restTemplate.patchForObject(ROLLBACK_RESOURCES_2PC_SECOND_HOST, null, Resource.class, resourceId);
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        this.restTemplate.patchForObject(COMMIT_RESOURCES_2PC_FIRST_HOST, null, Resource.class, resourceId);
+        this.restTemplate.patchForObject(COMMIT_RESOURCES_2PC_SECOND_HOST, null, Resource.class, resourceId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(resource);
     }
 }

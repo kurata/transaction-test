@@ -1,6 +1,10 @@
 package br.com.aqueteron.transaction.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,25 +32,35 @@ public class ResourceController implements ResourceApiDefinition {
 
     private static final String ROLLBACK_RESOURCES_2PC_SECOND_HOST = "http://localhost:9070/api/v1/resources/2pc/{id}/rollback";
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResourceController.class);
+
     private RestTemplate restTemplate;
 
+    private TransactionServiceContext transactionServiceContext;
+
     @Autowired
-    public ResourceController(final RestTemplate restTemplate) {
+    public ResourceController(final RestTemplate restTemplate, final TransactionServiceContext transactionServiceContext) {
         this.restTemplate = restTemplate;
+        this.transactionServiceContext = transactionServiceContext;
     }
 
     @Override
     public ResponseEntity<Resource> postResources(final Resource resource) {
         String resourceId = resource.getId();
+        LOGGER.debug(String.format("Creating resource with id: %s", resourceId));
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("x-correlation-id", this.transactionServiceContext.getCorrelationId());
+        HttpEntity<Resource> resourceHttpEntity = new HttpEntity(resource, httpHeaders);
         try {
-            this.restTemplate.postForEntity(RESOURCES_FIRST_HOST, resource, Resource.class);
+            this.restTemplate.postForEntity(RESOURCES_FIRST_HOST, resourceHttpEntity, Resource.class);
             try {
-                this.restTemplate.postForEntity(RESOURCE_SECOND_HOST, resource, Resource.class);
+                this.restTemplate.postForEntity(RESOURCE_SECOND_HOST, resourceHttpEntity, Resource.class);
                 return ResponseEntity.status(HttpStatus.CREATED).body(resource);
             } catch (HttpClientErrorException e) {
                 this.restTemplate.delete(RESOURCE_FIRST_HOST, resourceId);
             }
         } catch (HttpClientErrorException e) {
+            LOGGER.warn(e.getMessage(), e);
         }
         return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
@@ -54,16 +68,22 @@ public class ResourceController implements ResourceApiDefinition {
     @Override
     public ResponseEntity<Resource> postResources2pc(final Resource resource) {
         String resourceId = resource.getId();
+        LOGGER.debug(String.format("Creating resource with id: %s", resourceId));
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("x-correlation-id", this.transactionServiceContext.getCorrelationId());
         try {
-            this.restTemplate.postForEntity(RESOURCES_2PC_FIRST_HOST, resource, Resource.class);
-            this.restTemplate.postForEntity(RESOURCES_2PC_SECOND_HOST, resource, Resource.class);
+            HttpEntity<Resource> resourceHttpEntity = new HttpEntity(resource, httpHeaders);
+            this.restTemplate.postForEntity(RESOURCES_2PC_FIRST_HOST, resourceHttpEntity, Resource.class);
+            this.restTemplate.postForEntity(RESOURCES_2PC_SECOND_HOST, resourceHttpEntity, Resource.class);
         } catch (HttpClientErrorException e) {
-            this.restTemplate.patchForObject(ROLLBACK_RESOURCES_2PC_FIRST_HOST, null, Resource.class, resourceId);
-            this.restTemplate.patchForObject(ROLLBACK_RESOURCES_2PC_SECOND_HOST, null, Resource.class, resourceId);
+            HttpEntity<Resource> httpEntity = new HttpEntity(null, httpHeaders);
+            this.restTemplate.patchForObject(ROLLBACK_RESOURCES_2PC_FIRST_HOST, httpEntity, Resource.class, resourceId);
+            this.restTemplate.patchForObject(ROLLBACK_RESOURCES_2PC_SECOND_HOST, httpEntity, Resource.class, resourceId);
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
-        this.restTemplate.patchForObject(COMMIT_RESOURCES_2PC_FIRST_HOST, null, Resource.class, resourceId);
-        this.restTemplate.patchForObject(COMMIT_RESOURCES_2PC_SECOND_HOST, null, Resource.class, resourceId);
+        HttpEntity<Resource> httpEntity = new HttpEntity(null, httpHeaders);
+        this.restTemplate.patchForObject(COMMIT_RESOURCES_2PC_FIRST_HOST, httpEntity, Resource.class, resourceId);
+        this.restTemplate.patchForObject(COMMIT_RESOURCES_2PC_SECOND_HOST, httpEntity, Resource.class, resourceId);
         return ResponseEntity.status(HttpStatus.CREATED).body(resource);
     }
 }

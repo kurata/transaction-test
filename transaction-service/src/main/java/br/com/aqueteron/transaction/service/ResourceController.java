@@ -60,7 +60,7 @@ public class ResourceController implements ResourceApiDefinition {
                 this.restTemplate.delete(RESOURCE_FIRST_HOST, resourceId);
             }
         } catch (HttpClientErrorException e) {
-            LOGGER.warn(e.getMessage(), e);
+//            LOGGER.warn(e.getMessage(), e);
         }
         return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }

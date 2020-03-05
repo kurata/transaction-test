@@ -1,9 +1,8 @@
 package br.com.aqueteron.transaction.service;
 
-import org.springframework.stereotype.Component;
+import java.io.Serializable;
 
-@Component
-public class TransactionServiceContext {
+public class TransactionServiceContext implements Serializable {
 
     private String correlationId;
 

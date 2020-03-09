@@ -1,0 +1,9 @@
+version: "3"
+services:
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    container_name: "transaction_rabbitmq"
+    ports:
+      - "5671:5671"
+      - "5672:5672"
+      - "15672:15672"

@@ -31,4 +31,13 @@ public interface ResourceApiDefinition {
     @ResponseStatus(HttpStatus.CREATED)
     ResponseEntity<Resource> postResources2pc(@RequestBody final Resource resource);
 
+    @ApiOperation(
+            value = "Create a Number.",
+            consumes = "application/json",
+            produces = "application/json"
+    )
+    @PostMapping("/saga")
+    @ResponseStatus(HttpStatus.CREATED)
+    ResponseEntity<Resource> postResourcesSaga(@RequestBody final Resource resource);
+
 }

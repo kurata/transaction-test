@@ -37,3 +37,10 @@ spring:
       enabled: always
   profiles:
     active: local
+
+
+transaction:
+  firstResourceSuccessQueue: serverOne.successResponseQueue
+  firstResourceErrorQueue: serverOne.errorResponseQueue
+  secondResourceSuccessQueue: serverTwo.successResponseQueue
+  secondResourceErrorQueue: serverTwo.errorResponseQueue

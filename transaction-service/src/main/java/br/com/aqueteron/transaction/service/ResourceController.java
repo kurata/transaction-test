@@ -2,6 +2,7 @@ package br.com.aqueteron.transaction.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -38,10 +39,13 @@ public class ResourceController implements ResourceApiDefinition {
 
     private TransactionServiceContext transactionServiceContext;
 
+    private RabbitTemplate rabbitTemplate;
+
     @Autowired
-    public ResourceController(final RestTemplate restTemplate, final TransactionServiceContext transactionServiceContext) {
+    public ResourceController(final RestTemplate restTemplate, final TransactionServiceContext transactionServiceContext, final RabbitTemplate rabbitTemplate) {
         this.restTemplate = restTemplate;
         this.transactionServiceContext = transactionServiceContext;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     @Override
@@ -84,6 +88,12 @@ public class ResourceController implements ResourceApiDefinition {
         HttpEntity<Resource> httpEntity = new HttpEntity(null, httpHeaders);
         this.restTemplate.patchForObject(COMMIT_RESOURCES_2PC_FIRST_HOST, httpEntity, Resource.class, resourceId);
         this.restTemplate.patchForObject(COMMIT_RESOURCES_2PC_SECOND_HOST, httpEntity, Resource.class, resourceId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(resource);
+    }
+
+    @Override
+    public ResponseEntity<Resource> postResourcesSaga(Resource resource) {
+        this.rabbitTemplate.convertAndSend("serverOne.resourceRequestQueue", resource.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(resource);
     }
 }

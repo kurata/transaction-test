@@ -1,5 +1,7 @@
 package br.com.aqueteron.transaction.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -92,8 +94,14 @@ public class ResourceController implements ResourceApiDefinition {
     }
 
     @Override
-    public ResponseEntity<Resource> postResourcesSaga(Resource resource) {
-        this.rabbitTemplate.convertAndSend("serverOne.resourceRequestQueue", resource.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(resource);
+    public ResponseEntity<Resource> postResourcesSaga(final Resource resource) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            ResourceQueueMessage rqm = new ResourceQueueMessage(this.transactionServiceContext.getCorrelationId(), resource.getId());
+            this.rabbitTemplate.convertAndSend("serverOne.resourceRequestQueue", objectMapper.writeValueAsString(rqm));
+            return ResponseEntity.status(HttpStatus.CREATED).body(resource);
+        } catch (JsonProcessingException e) {
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build();
+        }
     }
 }

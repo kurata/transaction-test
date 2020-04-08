@@ -3,6 +3,8 @@ server:
   # Spring MVC dispatcher servlet path. Needs to be different than Jersey's to enable/disable Actuator endpoints access (/info, /health, ...)
   servlet.path: /
 
-spring:
-  datasources:
-    data: classpath*:profileOne/data-h2.sql
+transaction:
+  resourceRequestQueue: serverOne.resourceRequestQueue
+  resourceRollbackQueue: serverOne.resourceRequestRollbackQueue
+  resourceResponseSuccessQueue: serverOne.resourceResponseSuccessQueue
+  resourceResponseErrorQueue: serverOne.resourceResponseErrorQueue

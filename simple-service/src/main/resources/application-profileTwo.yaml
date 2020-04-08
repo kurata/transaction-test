@@ -2,3 +2,9 @@ server:
   port: 9070
   # Spring MVC dispatcher servlet path. Needs to be different than Jersey's to enable/disable Actuator endpoints access (/info, /health, ...)
   servlet.path: /
+
+transaction:
+  resourceRequestQueue: serverTwo.resourceRequestQueue
+  resourceRollbackQueue: serverTwo.resourceRequestRollbackQueue
+  resourceResponseSuccessQueue: serverTwo.resourceResponseSuccessQueue
+  resourceResponseErrorQueue: serverTwo.resourceResponseErrorQueue

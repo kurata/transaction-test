@@ -1,7 +1,10 @@
 package br.com.aqueteron.transaction.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -38,10 +41,13 @@ public class ResourceController implements ResourceApiDefinition {
 
     private TransactionServiceContext transactionServiceContext;
 
+    private RabbitTemplate rabbitTemplate;
+
     @Autowired
-    public ResourceController(final RestTemplate restTemplate, final TransactionServiceContext transactionServiceContext) {
+    public ResourceController(final RestTemplate restTemplate, final TransactionServiceContext transactionServiceContext, final RabbitTemplate rabbitTemplate) {
         this.restTemplate = restTemplate;
         this.transactionServiceContext = transactionServiceContext;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     @Override
@@ -85,5 +91,17 @@ public class ResourceController implements ResourceApiDefinition {
         this.restTemplate.patchForObject(COMMIT_RESOURCES_2PC_FIRST_HOST, httpEntity, Resource.class, resourceId);
         this.restTemplate.patchForObject(COMMIT_RESOURCES_2PC_SECOND_HOST, httpEntity, Resource.class, resourceId);
         return ResponseEntity.status(HttpStatus.CREATED).body(resource);
+    }
+
+    @Override
+    public ResponseEntity<Resource> postResourcesSaga(final Resource resource) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            ResourceQueueMessage rqm = new ResourceQueueMessage(this.transactionServiceContext.getCorrelationId(), resource.getId());
+            this.rabbitTemplate.convertAndSend("serverOne.resourceRequestQueue", objectMapper.writeValueAsString(rqm));
+            return ResponseEntity.status(HttpStatus.CREATED).body(resource);
+        } catch (JsonProcessingException e) {
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build();
+        }
     }
 }

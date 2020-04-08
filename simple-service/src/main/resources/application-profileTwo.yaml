@@ -5,4 +5,6 @@ server:
 
 transaction:
   resourceRequestQueue: serverTwo.resourceRequestQueue
-  resourceRollbackQueue: serverTwo.resourceRollbackQueue
+  resourceRollbackQueue: serverTwo.resourceRequestRollbackQueue
+  resourceResponseSuccessQueue: serverTwo.resourceResponseSuccessQueue
+  resourceResponseErrorQueue: serverTwo.resourceResponseErrorQueue

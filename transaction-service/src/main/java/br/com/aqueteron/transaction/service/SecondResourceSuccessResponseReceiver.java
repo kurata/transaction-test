@@ -10,6 +10,6 @@ public class SecondResourceSuccessResponseReceiver {
     private static final Logger LOGGER = LoggerFactory.getLogger(SecondResourceSuccessResponseReceiver.class);
 
     public void receiveMessage(String in) {
-        LOGGER.debug(String.format("Receive service one success result from resource id %s", in));
+        LOGGER.debug(String.format("Receive service two success result from resource id %s", in));
     }
 }

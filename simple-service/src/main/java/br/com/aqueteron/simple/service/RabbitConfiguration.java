@@ -40,6 +40,7 @@ public class RabbitConfiguration {
         resourceRequestReceiverContainer.setConnectionFactory(connectionFactory);
         resourceRequestReceiverContainer.setQueueNames(this.resourceRequestQueue);
         resourceRequestReceiverContainer.setMessageListener(resourceRequestReceiverListener);
+        resourceRequestReceiverContainer.setAfterReceivePostProcessors(new LogMessagePostProcessor());
         return resourceRequestReceiverContainer;
     }
 
@@ -54,6 +55,7 @@ public class RabbitConfiguration {
         resourceRequestReceiverContainer.setConnectionFactory(connectionFactory);
         resourceRequestReceiverContainer.setQueueNames(this.resourceRollbackQueue);
         resourceRequestReceiverContainer.setMessageListener(resourceRequestReceiverListener);
+        resourceRequestReceiverContainer.setAfterReceivePostProcessors(new LogMessagePostProcessor());
         return resourceRequestReceiverContainer;
     }
 }

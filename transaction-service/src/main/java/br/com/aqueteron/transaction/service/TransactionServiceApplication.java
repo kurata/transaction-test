@@ -23,7 +23,7 @@ public class TransactionServiceApplication {
     }
 
     @Bean
-    @RequestScope
+//    @RequestScope
     public TransactionServiceContext transactionServiceContext() {
         return new TransactionServiceContext();
     }

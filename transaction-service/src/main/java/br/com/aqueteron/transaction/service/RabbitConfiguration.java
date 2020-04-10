@@ -38,11 +38,15 @@ public class RabbitConfiguration {
     }
 
     @Bean
-    public SimpleMessageListenerContainer firstResourceSuccessResponseContainer(final ConnectionFactory connectionFactory, final MessageListenerAdapter firstResourceSuccessResponseReceiverListener) {
+    public SimpleMessageListenerContainer firstResourceSuccessResponseContainer(
+            final ConnectionFactory connectionFactory,
+            final MessageListenerAdapter firstResourceSuccessResponseReceiverListener,
+            final LogMessagePostProcessor logMessagePostProcessor) {
         SimpleMessageListenerContainer firstResourceSuccessResponseContainer = new SimpleMessageListenerContainer();
         firstResourceSuccessResponseContainer.setConnectionFactory(connectionFactory);
         firstResourceSuccessResponseContainer.setQueueNames(this.firstResourceSuccessQueueName);
         firstResourceSuccessResponseContainer.setMessageListener(firstResourceSuccessResponseReceiverListener);
+        firstResourceSuccessResponseContainer.setAfterReceivePostProcessors(logMessagePostProcessor);
         return firstResourceSuccessResponseContainer;
     }
 
@@ -52,11 +56,15 @@ public class RabbitConfiguration {
     }
 
     @Bean
-    public SimpleMessageListenerContainer firstResourceErrorResponseContainer(final ConnectionFactory connectionFactory, final MessageListenerAdapter firstResourceErrorResponseReceiverListener) {
+    public SimpleMessageListenerContainer firstResourceErrorResponseContainer(
+            final ConnectionFactory connectionFactory,
+            final MessageListenerAdapter firstResourceErrorResponseReceiverListener,
+            final LogMessagePostProcessor logMessagePostProcessor) {
         SimpleMessageListenerContainer firstResourceErrorResponseContainer = new SimpleMessageListenerContainer();
         firstResourceErrorResponseContainer.setConnectionFactory(connectionFactory);
         firstResourceErrorResponseContainer.setQueueNames(this.firstResourceErrorQueueName);
         firstResourceErrorResponseContainer.setMessageListener(firstResourceErrorResponseReceiverListener);
+        firstResourceErrorResponseContainer.setAfterReceivePostProcessors(logMessagePostProcessor);
         return firstResourceErrorResponseContainer;
     }
 
@@ -66,11 +74,15 @@ public class RabbitConfiguration {
     }
 
     @Bean
-    public SimpleMessageListenerContainer secondResourceSuccessResponseContainer(final ConnectionFactory connectionFactory, final MessageListenerAdapter secondResourceSuccessResponseReceiverListener) {
+    public SimpleMessageListenerContainer secondResourceSuccessResponseContainer(
+            final ConnectionFactory connectionFactory,
+            final MessageListenerAdapter secondResourceSuccessResponseReceiverListener,
+            final LogMessagePostProcessor logMessagePostProcessor) {
         SimpleMessageListenerContainer secondResourceSuccessResponseContainer = new SimpleMessageListenerContainer();
         secondResourceSuccessResponseContainer.setConnectionFactory(connectionFactory);
         secondResourceSuccessResponseContainer.setQueueNames(this.secondResourceSuccessQueueName);
         secondResourceSuccessResponseContainer.setMessageListener(secondResourceSuccessResponseReceiverListener);
+        secondResourceSuccessResponseContainer.setAfterReceivePostProcessors(logMessagePostProcessor);
         return secondResourceSuccessResponseContainer;
     }
 
@@ -80,11 +92,15 @@ public class RabbitConfiguration {
     }
 
     @Bean
-    public SimpleMessageListenerContainer secondResourceErrorResponseContainer(final ConnectionFactory connectionFactory, final MessageListenerAdapter secondResourceErrorResponseReceiverListener) {
+    public SimpleMessageListenerContainer secondResourceErrorResponseContainer(
+            final ConnectionFactory connectionFactory,
+            final MessageListenerAdapter secondResourceErrorResponseReceiverListener,
+            final LogMessagePostProcessor logMessagePostProcessor) {
         SimpleMessageListenerContainer secondResourceErrorResponseContainer = new SimpleMessageListenerContainer();
         secondResourceErrorResponseContainer.setConnectionFactory(connectionFactory);
         secondResourceErrorResponseContainer.setQueueNames(this.secondResourceErrorQueueName);
         secondResourceErrorResponseContainer.setMessageListener(secondResourceErrorResponseReceiverListener);
+        secondResourceErrorResponseContainer.setAfterReceivePostProcessors(logMessagePostProcessor);
         return secondResourceErrorResponseContainer;
     }
 

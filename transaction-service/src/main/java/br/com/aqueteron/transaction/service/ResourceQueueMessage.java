@@ -8,6 +8,11 @@ public class ResourceQueueMessage implements Serializable {
 
     private final String resourceId;
 
+    public ResourceQueueMessage() {
+        this.correlationId = null;
+        this.resourceId = null;
+    }
+
     public ResourceQueueMessage(final String correlationId, final String resourceId) {
         this.correlationId = correlationId;
         this.resourceId = resourceId;

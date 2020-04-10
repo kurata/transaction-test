@@ -9,7 +9,13 @@ public class SecondResourceSuccessResponseReceiver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SecondResourceSuccessResponseReceiver.class);
 
-    public void receiveMessage(String in) {
+    private static final String CORRELATION_ID_LOG_VAR_NAME = "correlationId";
+
+    public void receiveMessage(final byte[] in) {
+        this.receiveMessage(new String(in));
+    }
+
+    public void receiveMessage(final String in) {
         LOGGER.debug(String.format("Receive service two success result from resource id %s", in));
     }
 }

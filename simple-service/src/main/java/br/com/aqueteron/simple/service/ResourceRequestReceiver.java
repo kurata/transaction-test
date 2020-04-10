@@ -3,6 +3,8 @@ package br.com.aqueteron.simple.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +36,10 @@ public class ResourceRequestReceiver {
         this.rabbitTemplate = rabbitTemplate;
     }
 
+    public void receiveMessage(final byte[] in) throws IOException {
+        this.receiveMessage(new String(in));
+    }
+
     public void receiveMessage(final String in) throws IOException {
         LOGGER.debug(String.format("Receive service request from resource id %s", in));
         ObjectMapper objectMapper = new ObjectMapper();
@@ -43,7 +49,9 @@ public class ResourceRequestReceiver {
             Resource resource = new Resource(rqm.getResourceId());
             resource.setState(ResourceState.COMMITTED);
             this.resourceRepository.save(resource);
-            this.rabbitTemplate.convertAndSend(this.resourceResponseSuccessQueue, objectMapper.writeValueAsString(rqm));
+            Message message = MessageBuilder.withBody(objectMapper.writeValueAsBytes(rqm)).setHeader("x-correlation-id", rqm.getCorrelationId()).build();
+            this.rabbitTemplate.send(this.resourceResponseSuccessQueue, message);
+//            this.rabbitTemplate.convertAndSend(this.resourceResponseSuccessQueue, objectMapper.writeValueAsString(rqm));
         } else {
             this.rabbitTemplate.convertAndSend(this.resourceResponseErrorQueue, objectMapper.writeValueAsString(rqm));
         }

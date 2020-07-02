@@ -26,7 +26,7 @@
 
 
         <jackson-annotations.version>2.9.8</jackson-annotations.version>
-        <mysql.version>5.1.47</mysql.version>
+        <mysql.version>8.0.16</mysql.version>
         <h2.version>1.4.198</h2.version>
 
         <dbunit.version>2.5.2</dbunit.version>
